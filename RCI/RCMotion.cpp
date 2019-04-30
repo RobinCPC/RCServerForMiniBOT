@@ -430,6 +430,24 @@ RTN_ERR RCMotion_SetAccParam( const I32_T DevID, const JointAcc_T *JointAcc )
 	return ERR_NEXMOTION_SUCCESS;
 }
 
+RTN_ERR RCMotion_GetActualPos(const I32_T DevID, Pos_T *JointPos)
+{
+	__ASSERT( JointPos != NULL );
+
+	RTN_ERR ret;
+	//I32_T   axisIndex;
+	I32_T   groupIndex = 0;
+
+  ret = NMC_GroupGetActualPosAcs(DevID, groupIndex, JointPos);
+
+  if (ret != ERR_NEXMOTION_SUCCESS)
+  {
+    printf("get actual acs pose failed. error code: %d\n %s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+  }
+
+  return ret;
+}
+
 RTN_ERR RCMotion_Run( const I32_T DevID, const Path_T *PathArr, const I32_T totalPointNum )
 {
 	__ASSERT( PathArr != NULL );
@@ -485,25 +503,44 @@ RTN_ERR RCMotion_Run( const I32_T DevID, const Path_T *PathArr, const I32_T tota
 		}
 	}
 
-	ret = NMC_GroupGetStatus( DevID, groupIndex, &groupStatus );
-	if( ret != 0 )
-		return ret;
+	//ret = NMC_GroupGetStatus( DevID, groupIndex, &groupStatus );
+	//if( ret != 0 )
+	//	return ret;
 
-	while( ( groupStatus & GROUPSTATUS_TARGETREACHED ) == 0 )
-	{
-		Sleep( 500 );
+	//while( ( groupStatus & GROUPSTATUS_TARGETREACHED ) == 0 )
+	//{
+	//	Sleep( 500 );
 
-        if( motionCloseFlag == 1 )
-			return ERR_NEXMOTION_SUCCESS;
+  //      if( motionCloseFlag == 1 )
+	//		return ERR_NEXMOTION_SUCCESS;
 
-		ret = NMC_GroupGetStatus( DevID, groupIndex, &groupStatus );
-		if( ret != 0 )
-			return ret;
-	}
+	//	ret = NMC_GroupGetStatus( DevID, groupIndex, &groupStatus );
+	//	if( ret != 0 )
+	//		return ret;
+	//}
 
-	printf( "\nTarget Pos. reached!\n" );
+	//printf( "\nTarget Pos. reached!\n" );
 
 	return ERR_NEXMOTION_SUCCESS;
+}
+
+bool RCMotion_CheckMotionDone(const I32_T DevID)
+{
+  // Check if Motion done. True = reach, False = Still moving. (or different error TODO)
+  I32_T groupIndex = 0;
+  I32_T groupStatus;
+  I32_T ret = NMC_GroupGetStatus(DevID, groupIndex, &groupStatus);
+  if (ret != 0)
+    return false;
+
+  if ((groupStatus & GROUPSTATUS_TARGETREACHED))
+  {
+    printf("\nTarget Pos. reached!\n");
+    return true;
+  }
+  else
+    return false;
+
 }
 
 RTN_ERR __CheckPosReach( const I32_T DevID )

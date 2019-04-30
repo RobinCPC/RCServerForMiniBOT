@@ -48,7 +48,9 @@ RTN_ERR RCMotion_Initial( OpMode_T opMode, I32_T *PRetDevID );
 RTN_ERR RCMotion_Close( const I32_T DevID );
 RTN_ERR RCMotion_SetVelParam( const I32_T DevID, const JointVel_T *JointVel );
 RTN_ERR RCMotion_SetAccParam( const I32_T DevID, const JointAcc_T *JointAcc );
+RTN_ERR RCMotion_GetActualPos( const I32_T DevID, Pos_T *JointPos );
 RTN_ERR RCMotion_Run( const I32_T DevID, const Path_T *PathArr, const I32_T totalPointNum );
+bool RCMotion_CheckMotionDone(const I32_T DevID);
 void RCMotion_Stop( const I32_T DevID );
 
 RTN_ERR __CheckPosReach( const I32_T DevID );

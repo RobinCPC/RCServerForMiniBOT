@@ -512,7 +512,8 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
                 return 0;
             }
             
-            ptr->GUI_ShowRecvPackage_PInfo( retRecv, packageRecv.cmd, packageRecv.pointData.index, packageRecv.pointData.data, MAX_POINT_DATA_SIZE );
+            if (packageRecv.cmd != RCSVR_CMD_GET_ACTUAL_POS)
+              ptr->GUI_ShowRecvPackage_PInfo( retRecv, packageRecv.cmd, packageRecv.pointData.index, packageRecv.pointData.data, MAX_POINT_DATA_SIZE );
 
 
 
@@ -567,6 +568,36 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
                     ptr->GUI_Close();
                     return 0;
                 }
+            }
+            else if( packageRecv.cmd == RCSVR_CMD_GET_ACTUAL_POS )
+            { 
+                // Third package
+                // Get actual joint positions
+                // Send back to ROS Client
+
+                Pos_T jointPos;
+                ret = RCMotion_GetActualPos(gDevID, &jointPos);
+
+                // Send joint value to client
+                packageSend.cmd = RCSVR_CMD_SEND_ACTUAL_POS;
+                packageSend.pointData.index = MINIBOTAXES;
+                for (int axis = 0; axis < MINIBOTAXES; ++axis)
+                {
+                    packageSend.pointData.data[axis] = jointPos.pos[axis];
+                }
+                ret = RCServer_SendPackage(pObj, &packageSend);
+
+                if (ret < 0)
+                {
+                    RCMotion_Close(gDevID);
+                    ptr->GUI_SetMotionInitFlag(DISABLE);
+
+                    RCServer_Close(pObj);
+                    ptr->GUI_ShowErr("RCServer_SendPackage", ret);
+                    ptr->GUI_Close();
+                    return 0;
+                }
+               
             }
             else
             {
@@ -651,10 +682,10 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
 
 
                 
-                    ptr->GUI_ShowMsg_PInfo( "Motion done" );
+                    //ptr->GUI_ShowMsg_PInfo( "Motion done" );
                 
-                    // Push state
-                    __RCServer_SetState( pObj, RCSVR_STATE_STANDBY );
+                    //// Push state
+                    //__RCServer_SetState( pObj, RCSVR_STATE_STANDBY );
                 
                 
                     // Send motion done to client
@@ -891,9 +922,23 @@ void CRCIDlg::OnTimer(UINT_PTR nIDEvent)
     RcSvrState_T  state;
     //------------------
     
-    
     // Show server state
     RCServer_GetState( pObj, &state );
+
+    // TODO: Using motion function to chekc if motion done (need critical section to prevent race motion dll)
+    if (state == RCSVR_STATE_RUN_MOTION)
+    {
+      bool isReach = RCMotion_CheckMotionDone(gDevID);
+      if (isReach)
+      {
+        this->GUI_ShowMsg_PInfo("Motion done");
+
+        // Push state
+        state = RCSVR_STATE_STANDBY;
+        __RCServer_SetState(pObj, RCSVR_STATE_STANDBY);
+      }
+    }
+    
     GUI_ShowSvrState( (I32_T) state );
 
     // Show receive total point
