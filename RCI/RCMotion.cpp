@@ -559,7 +559,7 @@ RTN_ERR __CheckPosReach( const I32_T DevID )
 	if( ret != 0 )
 		return ret;
 
-	while( ( groupStatus & GROUPSTATUS_TARGETREACHED ) == 0 )//當回傳值不等於NMC_GROUP_STATUS_MASK_CSTP
+	while( ( groupStatus & GROUPSTATUS_TARGETREACHED ) == 0 ) // When return value not equal to MC_GROUP_STATUS_MASK_CSTP
 	{
 		Sleep( sleepTime );
 

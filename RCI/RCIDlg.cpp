@@ -303,7 +303,7 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
     U32_T       portNum      = 0;
     CString     str;
     U32_T       timeCnt      = 0;
-    const U32_T waitTimeMs   = 6000;
+    const U32_T waitTimeMs   = 600000;
     RCPackage_T packageRecv;
     RTN_ERR     retRecv      = 0;
     I32_T       pointCnt     = 0;
@@ -712,6 +712,8 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
         {
             //No package
             ptr->GUI_ShowMsg_PInfo( "Client Disconnect..." );
+            gThreadMainEnable = DISABLE;  // Stop _Thread_Main
+            ptr->KillTimer(0);
         }
         else
         {
