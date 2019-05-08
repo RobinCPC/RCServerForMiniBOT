@@ -315,6 +315,7 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
     Path_T     *PPath        = NULL;
     I32_T       simulationEn = 0;
     OpMode_T    opMode;
+    I32_T       doHoming     = ENABLE;
     
 	//--------------------------------------
 
@@ -460,9 +461,12 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
     {
          opMode = OPERATION;
     }
+
+    // check if need homing
+    doHoming = ptr->GUI_GetHomingEn();
      
     
-    ret = RCMotion_Initial( opMode, &gDevID );
+    ret = RCMotion_Initial( opMode, doHoming, &gDevID );
     if( ret != ERR_RCSERVER_SECCESS )
     {
         RCMotion_Close( gDevID );
@@ -771,6 +775,8 @@ void CRCIDlg::GUI_Initial()
     //CheckBox
     mpChkBox_Simulation =  (CButton *)GetDlgItem( IDC_CHECK1 );
     mpChkBox_Simulation -> SetCheck(1);
+    mpChkBox_Home =  (CButton *)GetDlgItem( IDC_CHK_HOME );
+    mpChkBox_Home -> SetCheck(1);
     
     //Botton
     mpBtn_Start = (CButton *)GetDlgItem( IDC_BUTTON1 );
@@ -783,6 +789,12 @@ void CRCIDlg::GUI_Initial()
 I32_T CRCIDlg::GUI_GetSimulationEn()
 {
     return mpChkBox_Simulation -> GetCheck();
+}
+
+
+I32_T CRCIDlg::GUI_GetHomingEn()
+{
+    return mpChkBox_Home -> GetCheck();
 }
 
 

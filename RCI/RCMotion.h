@@ -44,7 +44,7 @@ typedef struct
 	F64_T jointPoint[MINIBOTAXES];
 }Path_T;
 
-RTN_ERR RCMotion_Initial( OpMode_T opMode, I32_T *PRetDevID );
+RTN_ERR RCMotion_Initial( const OpMode_T opMode, const I32_T &doHoming, I32_T *PRetDevID );
 RTN_ERR RCMotion_Close( const I32_T DevID );
 RTN_ERR RCMotion_SetVelParam( const I32_T DevID, const JointVel_T *JointVel );
 RTN_ERR RCMotion_SetAccParam( const I32_T DevID, const JointAcc_T *JointAcc );

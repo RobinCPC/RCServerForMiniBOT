@@ -54,6 +54,7 @@ public:
     bool GUI_GetMotionInitFlag( );
 
     I32_T GUI_GetSimulationEn();
+    I32_T GUI_GetHomingEn();
 
 
 
@@ -69,6 +70,7 @@ private:
     bool mMotionInitialFlag;
 
     CButton *mpChkBox_Simulation;
+    CButton *mpChkBox_Home;
 
 
     CButton *mpBtn_Start;

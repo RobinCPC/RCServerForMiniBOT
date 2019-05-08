@@ -2,7 +2,7 @@
 
 I32_T motionCloseFlag = 0;
 
-RTN_ERR RCMotion_Initial( OpMode_T opMode, I32_T *PRetDevID )
+RTN_ERR RCMotion_Initial( const OpMode_T opMode, const I32_T &doHoming, I32_T *PRetDevID )
 {
 	RTN_ERR ret;
 	
@@ -131,75 +131,78 @@ RTN_ERR RCMotion_Initial( OpMode_T opMode, I32_T *PRetDevID )
 	//=================================================
 	//            Step 5 : Group homing
 	//=================================================
-	if( opMode == SIMULATION )
-	{
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_X;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Y;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Z;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_A;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_B;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_C;
+  if (doHoming)  
+  {
+    if (opMode == SIMULATION)
+    {
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_X;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Y;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Z;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_A;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_B;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_C;
 
-		ret = NMC_GroupAxesHomeDrive( PRetDevID[0], groupIndex, groupAxesIdxMask );
-		if( ret != 0 )
-			return ret;
-		else
-		{
-			printf( "NMC_GroupAxesHomeDrive Moving\n" );
-			ret = __CheckPosReach( PRetDevID[0] );
-			if( ret != ERR_NEXMOTION_SUCCESS )
-			{
-				printf( "ERROR! Group%d _targetAxisPosArrivalCheck\n", groupIndex );
-				return ret;
-			}
-			else
-				printf( "\nNMC_GroupAxesHomeDrive Success!" );
-		}
-	}
-	else
-	{
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_A;
+      ret = NMC_GroupAxesHomeDrive(PRetDevID[0], groupIndex, groupAxesIdxMask);
+      if (ret != 0)
+        return ret;
+      else
+      {
+        printf("NMC_GroupAxesHomeDrive Moving\n");
+        ret = __CheckPosReach(PRetDevID[0]);
+        if (ret != ERR_NEXMOTION_SUCCESS)
+        {
+          printf("ERROR! Group%d _targetAxisPosArrivalCheck\n", groupIndex);
+          return ret;
+        }
+        else
+          printf("\nNMC_GroupAxesHomeDrive Success!");
+      }
+    }
+    else
+    {
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_A;
 
-		ret = NMC_GroupAxesHomeDrive( PRetDevID[0], groupIndex, groupAxesIdxMask );
-		if( ret != 0 )
-		{
-			printf( "ERROR! NMC_GroupAxesHomeDrive: (%d)%s.\n", ret, NMC_GetErrorDescription( ret, NULL, 0 ) );
-			return ret;
-		}
-		else
-		{
-			printf( "NMC_GroupAxesHomeDrive Moving\n" );
-			ret = __CheckPosReach( PRetDevID[0] );
-			if( ret != ERR_NEXMOTION_SUCCESS )
-			{
-				printf( "ERROR! Group%d _targetAxisPosArrivalCheck\n", groupIndex );
-				return ret;
-			}
-		}
+      ret = NMC_GroupAxesHomeDrive(PRetDevID[0], groupIndex, groupAxesIdxMask);
+      if (ret != 0)
+      {
+        printf("ERROR! NMC_GroupAxesHomeDrive: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+        return ret;
+      }
+      else
+      {
+        printf("NMC_GroupAxesHomeDrive Moving\n");
+        ret = __CheckPosReach(PRetDevID[0]);
+        if (ret != ERR_NEXMOTION_SUCCESS)
+        {
+          printf("ERROR! Group%d _targetAxisPosArrivalCheck\n", groupIndex);
+          return ret;
+        }
+      }
 
-		groupAxesIdxMask = 0;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_X;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Y;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Z;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_B;
-		groupAxesIdxMask += NMC_GROUP_AXIS_MASK_C;
+      groupAxesIdxMask = 0;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_X;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Y;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Z;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_B;
+      groupAxesIdxMask += NMC_GROUP_AXIS_MASK_C;
 
-		ret = NMC_GroupAxesHomeDrive( PRetDevID[0], groupIndex, groupAxesIdxMask );
-		if( ret != 0 )
-			return ret;
-		else
-		{
-			printf( "NMC_GroupAxesHomeDrive Moving\n" );
-			ret = __CheckPosReach( PRetDevID[0] );
-			if( ret != ERR_NEXMOTION_SUCCESS )
-			{
-				printf( "ERROR! Group%d _targetAxisPosArrivalCheck\n", groupIndex );
-				return ret;
-			}
-			else
-				printf( "\nNMC_GroupAxesHomeDrive Success!" );
-		}
-	}
+      ret = NMC_GroupAxesHomeDrive(PRetDevID[0], groupIndex, groupAxesIdxMask);
+      if (ret != 0)
+        return ret;
+      else
+      {
+        printf("NMC_GroupAxesHomeDrive Moving\n");
+        ret = __CheckPosReach(PRetDevID[0]);
+        if (ret != ERR_NEXMOTION_SUCCESS)
+        {
+          printf("ERROR! Group%d _targetAxisPosArrivalCheck\n", groupIndex);
+          return ret;
+        }
+        else
+          printf("\nNMC_GroupAxesHomeDrive Success!");
+      }
+    }
+  }
 
 	//=================================================
 	//          Step 6 : Posture initialize...
