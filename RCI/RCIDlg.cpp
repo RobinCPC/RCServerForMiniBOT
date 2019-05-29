@@ -603,6 +603,26 @@ DWORD WINAPI _Thread_Main( LPVOID lpParameter )
                 }
                
             }
+            else if (packageRecv.cmd == RCSVR_CMD_MOTION_HALT)
+            {
+                ret = RCMotion_Halt(gDevID);
+
+                // Send the result of halt command back to client
+                packageSend.cmd = RCSVR_CMD_MOTION_HALT;
+                packageSend.pointData.index = ret;
+                ret = RCServer_SendPackage(pObj, &packageSend);
+
+                if (ret < 0)
+                {
+                    RCMotion_Close(gDevID);
+                    ptr->GUI_SetMotionInitFlag(DISABLE);
+
+                    RCServer_Close(pObj);
+                    ptr->GUI_ShowErr("RCServer_SendPackage", ret);
+                    ptr->GUI_Close();
+                    return 0;
+                }
+            }
             else
             {
                 ret = RCServer_ProcessPackage( pObj, &packageRecv );

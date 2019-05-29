@@ -527,6 +527,21 @@ RTN_ERR RCMotion_Run( const I32_T DevID, const Path_T *PathArr, const I32_T tota
 	return ERR_NEXMOTION_SUCCESS;
 }
 
+RTN_ERR RCMotion_Halt(const I32_T DevID)
+{
+  RTN_ERR ret;
+  I32_T groupIndex = 0;
+
+  ret = NMC_GroupHalt(DevID, groupIndex);
+
+  if (ret != ERR_NEXMOTION_SUCCESS)
+  {
+    printf("Halt motion failed. error code: %d\n %s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+  }
+
+  return ret;
+}
+
 bool RCMotion_CheckMotionDone(const I32_T DevID)
 {
   // Check if Motion done. True = reach, False = Still moving. (or different error TODO)
