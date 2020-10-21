@@ -22,6 +22,7 @@ RTN_ERR RCMotion_Initial( const OpMode_T opMode, const I32_T &doHoming, I32_T *P
 
 	Pos_T   actPosAcs;
 	Pos_T   cmdPosAcs        = { 0 };
+	Pos_T	homePosition	 = { 0 };
 
 
 	
@@ -135,6 +136,13 @@ RTN_ERR RCMotion_Initial( const OpMode_T opMode, const I32_T &doHoming, I32_T *P
   {
     if (opMode == SIMULATION)
     {
+	  homePosition.pos[0] =  0;
+	  homePosition.pos[1] = 90;
+	  homePosition.pos[2] =	 0;
+	  homePosition.pos[3] =  0;
+	  homePosition.pos[4] =-90;
+	  homePosition.pos[5] =  0;
+
       groupAxesIdxMask += NMC_GROUP_AXIS_MASK_X;
       groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Y;
       groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Z;
@@ -142,20 +150,12 @@ RTN_ERR RCMotion_Initial( const OpMode_T opMode, const I32_T &doHoming, I32_T *P
       groupAxesIdxMask += NMC_GROUP_AXIS_MASK_B;
       groupAxesIdxMask += NMC_GROUP_AXIS_MASK_C;
 
-      ret = NMC_GroupAxesHomeDrive(PRetDevID[0], groupIndex, groupAxesIdxMask);
+      ret = NMC_GroupSetHomePos(PRetDevID[0], groupIndex, groupAxesIdxMask, &homePosition);
       if (ret != 0)
         return ret;
       else
       {
-        printf("NMC_GroupAxesHomeDrive Moving\n");
-        ret = __CheckPosReach(PRetDevID[0]);
-        if (ret != ERR_NEXMOTION_SUCCESS)
-        {
-          printf("ERROR! Group%d _targetAxisPosArrivalCheck\n", groupIndex);
-          return ret;
-        }
-        else
-          printf("\nNMC_GroupAxesHomeDrive Success!");
+        printf("NMC_GroupSetHomePos Success! groupAxesIdxMask=%d\n", groupAxesIdxMask);
       }
     }
     else
@@ -211,7 +211,7 @@ RTN_ERR RCMotion_Initial( const OpMode_T opMode, const I32_T &doHoming, I32_T *P
 	cmdPosAcs.pos[1] = 90;
 	cmdPosAcs.pos[2] = 0;
 	cmdPosAcs.pos[3] = 0;
-	cmdPosAcs.pos[4] = 0;
+	cmdPosAcs.pos[4] =-90;
 	cmdPosAcs.pos[5] = 0;
 
     groupAxesIdxMask = 0;
